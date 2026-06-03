@@ -5,7 +5,7 @@ DOMAIN = "disasterinformation"
 # JMA BOSAI API URLs
 JMA_BOSAI_BASE_URL = "https://www.jma.go.jp/bosai"
 JMA_BOSAI_AREA_URL = f"{JMA_BOSAI_BASE_URL}/common/const/area.json"
-JMA_BOSAI_WARNING_URL = f"{JMA_BOSAI_BASE_URL}/warning/data/warning"
+JMA_BOSAI_WARNING_URL = f"{JMA_BOSAI_BASE_URL}/warning/data/r8"
 JMA_BOSAI_EARTHQUAKE_URL = f"{JMA_BOSAI_BASE_URL}/quake/data"
 JMA_BOSAI_INFORMATION_URL = f"{JMA_BOSAI_BASE_URL}/information/data/information.json"
 
