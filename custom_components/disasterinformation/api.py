@@ -169,7 +169,7 @@ class JMABosaiApiClient:
         }
 
 
-    def _process_warning_data(self, data: Dict[str, Any], target_area_code: str, city_area_code: str = None) -> Dict[str, Any]:
+    def _process_warning_data(self, timeline_data: Dict[str, Any], target_area_code: str, city_area_code: str = None) -> Dict[str, Any]:
         """Process warning data into structured format."""
         processed_data = {
             "status": "発表なし",
@@ -179,41 +179,42 @@ class JMABosaiApiClient:
             "headline": "",
             "report_datetime": None,
             "target_area": "",
-            "raw_data": data,
+            "raw_data": timeline_data,
         }
 
-        if not data:
+        if not timeline_data:
             return processed_data
 
-        # Extract basic information
-        if "headline" in data:
-            processed_data["headline"] = data["headline"]
-
-        if "reportDatetime" in data:
-            processed_data["report_datetime"] = data["reportDatetime"]
-
-        if "targetArea" in data:
-            processed_data["target_area"] = data["targetArea"]
-
-        # Process area types and warnings
-        area_types = data.get("areaTypes", [])
         active_warnings = []
         active_advisories = []
         active_emergency_warnings = []
 
-        _LOGGER.debug(f"Processing warning data for target area code: {target_area_code}, city area code: {city_area_code}")
+        for data in timeline_data:
+            # Extract basic information
+            if "headline" in data:
+                processed_data["headline"] = data["headline"]
 
-        for area_type in area_types:
-            areas = area_type.get("areas", [])
+            if "reportDatetime" in data:
+                processed_data["report_datetime"] = data["reportDatetime"]
+
+            if "targetArea" in data:
+                processed_data["target_area"] = data["targetArea"]
+
+            # Process area types and warnings
+            warning_data = data["warning"]
+
+            _LOGGER.debug(f"Processing warning data for target area code: {target_area_code}, city area code: {city_area_code}")
+
+            areas = warning_data.get("class20Items", [])
             for area in areas:
-                area_name = area.get("name", "")
-                area_code = area.get("code", "")
+                area_code = area.get("areaCode", "")
+                area_name = area.get("areaName", "")
                 
-                _LOGGER.debug(f"Checking area: {area_name} (code: {area_code})")
+                _LOGGER.debug(f"Checking code: {area_code})")
                 
-                # Check for warnings and filter by city area code if specified
-                warnings = area.get("warnings", [])
-                for warning in warnings:
+                # Check for kind of warnings and filter by city area code if specified
+                kinds = area.get("kinds", [])
+                for warning in kinds:
                     warning_status = warning.get("status")
                     
                     if warning_status in ["発表", "継続"]:
@@ -292,4 +293,3 @@ class JMABosaiApiClient:
                 warning_info["severity"] = "注意報"
         
         return warning_info
-
